@@ -51,6 +51,11 @@ button:focus-visible{outline:3px solid var(--n);outline-offset:2px}
 .ans.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--bg))}
 .ans.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--bg))}
 .ans:disabled{cursor:default}
+.wform{display:flex;flex-wrap:wrap;gap:10px}
+.wform input{font:600 26px Lexend,sans-serif;flex:1 1 180px;min-height:64px;padding:8px 16px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.wform input:focus-visible{outline:3px solid var(--n);outline-offset:2px}
+.wform input.right{border-color:var(--ok)}.wform input.wrong{border-color:var(--bad)}
+.wform .btn{min-height:64px}
 .fb{min-height:56px;margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 .fb p{margin:0;font-size:18px;font-weight:500}
 .fb .g{color:var(--ok)}.fb .b{color:var(--bad)}
@@ -96,7 +101,7 @@ button:focus-visible{outline:3px solid var(--n);outline-offset:2px}
 <main class="band">
   <a class="back" href="../index.html">← Kaikki mallit</a>
   <h1>Alkuaineiden merkit</h1>
-  <p class="lead">Harjoittele 34 yleisen alkuaineen nimiä ja kemiallisia merkkejä visalla, muistipelillä tai taulukon avulla.</p>
+  <p class="lead">Harjoittele 34 yleisen alkuaineen nimiä ja kemiallisia merkkejä visalla (vaihtoehdoista tai itse kirjoittaen), muistipelillä tai taulukon avulla.</p>
 
   <div class="bar">
     <div class="seg" role="group" aria-label="Tila">
@@ -130,7 +135,7 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(M
 const cap=t=>t[0].toUpperCase()+t.slice(1);
 
 /* ---------- VISA ---------- */
-const q={len:10,dir:'mix',list:[],i:0,score:0,wrong:[],answered:false,cur:null};
+const q={type:'mc',len:10,dir:'mix',list:[],i:0,score:0,wrong:[],answered:false,cur:null};
 function distractors(el){
   const sc=x=>(x.s[0]===el.s[0]?3:0)+(x.n[0]===el.n[0]?2:0)+([...x.s.toLowerCase()].some(c=>el.s.toLowerCase().includes(c))?1:0)+Math.random()*2;
   const c=E.filter(x=>x!==el).sort((a,b)=>sc(b)-sc(a));
@@ -150,6 +155,9 @@ function showQ(){
       <div class="seg sm" role="group" aria-label="Kysymyksen suunta">
         ${[['ns','Nimi → merkki'],['sn','Merkki → nimi'],['mix','Sekaisin']].map(([v,t])=>`<button data-dir="${v}" aria-pressed="${q.dir===v}">${t}</button>`).join('')}
       </div>
+      <div class="seg sm" role="group" aria-label="Vastaustapa">
+        ${[['mc','Vaihtoehdot'],['write','Kirjoita itse']].map(([v,t])=>`<button data-type="${v}" aria-pressed="${q.type===v}">${t}</button>`).join('')}
+      </div>
       <div class="seg sm" role="group" aria-label="Kysymysten määrä">
         ${[10,20].map(v=>`<button data-len="${v}" aria-pressed="${q.len===v}">${v} kysymystä</button>`).join('')}
       </div>
@@ -160,10 +168,12 @@ function showQ(){
         <div class="prog"><span>Kysymys ${q.i+1} / ${q.list.length}</span><span>Oikein ${q.score}</span></div>
         <div class="meter"><i style="width:${pct}%"></i></div>
         <p class="qtext">${d==='ns'?`Mikä on alkuaineen <b>${el.n}</b> kemiallinen merkki?`:`Mikä alkuaine on <b>${el.s}</b>?`}</p>
-        <div class="opts">${q.cur.opts.map((o,k)=>`<button class="ans" data-k="${k}"><kbd>${k+1}</kbd>${d==='ns'?o.s:o.n}</button>`).join('')}</div>
+        ${q.type==='mc'?`<div class="opts">${q.cur.opts.map((o,k)=>`<button class="ans" data-k="${k}"><kbd>${k+1}</kbd>${d==='ns'?o.s:o.n}</button>`).join('')}</div>`
+        :`<form id="wform" class="wform"><input id="winp" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${d==='ns'?'Kemiallinen merkki':'Alkuaineen nimi'}" placeholder="${d==='ns'?'Merkki, esim. Fe':'Nimi, esim. rauta'}"><button class="btn">Tarkista</button></form>`}
         <div class="fb" id="fb"></div>
       </div>
     </div>`;
+  const wi=$('winp');if(wi)wi.focus({preventScroll:true});
 }
 function answer(k){
   if(q.answered)return;q.answered=true;
@@ -171,6 +181,29 @@ function answer(k){
   document.querySelectorAll('.ans').forEach((b,j)=>{b.disabled=true;if(opts[j]===el)b.classList.add('right');else if(j===k)b.classList.add('wrong')});
   if(ok)q.score++;else q.wrong.push(el);
   $('fb').innerHTML=`<p class="${ok?'g':'b'}">${ok?'Oikein!':`Ei aivan. ${cap(el.n)} = ${el.s}`}</p><button class="btn" id="next">${q.i+1<q.list.length?'Seuraava':'Tulokset'} →</button>`;
+  $('next').focus({preventScroll:true});
+}
+const lev=(x,y)=>{const d=Array.from({length:x.length+1},(_,i)=>[i]);for(let j=1;j<=y.length;j++)d[0][j]=j;
+  for(let i=1;i<=x.length;i++)for(let j=1;j<=y.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(x[i-1]===y[j-1]?0:1));return d[x.length][y.length]};
+function answerWrite(v){
+  if(q.answered)return;
+  const {el,d}=q.cur,inp=$('winp');v=v.trim();
+  if(!v){inp.focus();return}
+  q.answered=true;let ok=false,msg;
+  if(d==='ns'){
+    if(v===el.s){ok=true;msg='Oikein!'}
+    else if(v.toLowerCase()===el.s.toLowerCase())msg=`Melkein! Merkissä iso ja pieni kirjain ratkaisevat: ${el.s}`;
+    else{const hit=E.find(x=>x.s===v);msg=hit?`Ei aivan. ${v} on ${hit.n}. ${cap(el.n)} = ${el.s}`:`Ei aivan. ${cap(el.n)} = ${el.s}`}
+  }else{
+    const w=v.toLowerCase();
+    if(w===el.n){ok=true;msg='Oikein!'}
+    else if(el.n.length>=5&&lev(w,el.n)===1){ok=true;msg=`Oikein! Tarkista kirjoitusasu: ${el.n}`}
+    else{const hit=E.find(x=>x.n===w);msg=hit?`Ei aivan. ${hit.n} on ${hit.s}. ${el.s} = ${el.n}`:`Ei aivan. ${el.s} = ${el.n}`}
+  }
+  if(ok)q.score++;else q.wrong.push(el);
+  inp.disabled=true;inp.classList.add(ok?'right':'wrong');
+  document.querySelector('#wform .btn').disabled=true;
+  $('fb').innerHTML=`<p class="${ok?'g':'b'}">${msg}</p><button class="btn" id="next">${q.i+1<q.list.length?'Seuraava':'Tulokset'} →</button>`;
   $('next').focus({preventScroll:true});
 }
 function endQuiz(){
@@ -260,6 +293,7 @@ document.addEventListener('click',e=>{
   else if(t.id==='next'){q.i++;showQ()}
   else if(d.dir){q.dir=d.dir;startQuiz()}
   else if(d.len){q.len=+d.len;startQuiz()}
+  else if(d.type){q.type=d.type;startQuiz()}
   else if(t.id==='again')startQuiz();
   else if(t.id==='retryW')startQuiz(shuffle(q.wrong));
   else if(d.c!==undefined)flip(+d.c);
@@ -269,8 +303,9 @@ document.addEventListener('click',e=>{
   else if(t.id==='toggleN'){hideNames=!hideNames;drawTable()}
   else if(d.pt!==undefined&&hideNames)t.classList.toggle('hide');
 });
+document.addEventListener('submit',e=>{if(e.target.id==='wform'){e.preventDefault();answerWrite($('winp').value)}});
 document.addEventListener('keydown',e=>{
-  if(st.mode!=='visa'||e.altKey||e.ctrlKey||e.metaKey)return;
+  if(st.mode!=='visa'||q.type!=='mc'||e.altKey||e.ctrlKey||e.metaKey)return;
   if(/^[1-4]$/.test(e.key)&&!q.answered&&document.querySelector('.ans')){answer(+e.key-1)}
 });
 show();
