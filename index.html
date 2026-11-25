@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luonnontieteiden mallit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Etusivu: kokoelma interaktiivisia malleja kemian ja fysiikan ilmiöistä.
+   Uuden mallin lisääminen: laita HTML-tiedosto kansioon mallit/ ja lisää rivi MALLIT-listaan alla. */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#10151b);--ink:light-dark(#15191f,#e9edf2);--muted:light-dark(#56606b,#9ba7b3);
+--line:light-dark(#dfe4ea,#28323d);--panel:light-dark(#f3f5f8,#161d25);
+--ke:light-dark(#d4421c,#ef6a40);--fy:light-dark(#1f5fbf,#5c9cff);--bi:light-dark(#2f7d4f,#5cc28a)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Lexend,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px);max-width:1240px;margin:0 auto}
+header{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px;align-items:center}
+h1{font-size:clamp(32px,5vw,52px);line-height:1.05;margin:0 0 12px;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:56ch;font-size:17px}
+.hero{width:100%;height:auto;display:block}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:36px 0 18px}
+.filters button{font:inherit;font-weight:500;min-height:44px;padding:8px 18px;border-radius:999px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.filters button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--fy);outline-offset:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.card{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--panel);border-radius:18px;overflow:hidden;transition:transform .15s ease}
+.card:hover{transform:translateY(-3px)}
+.thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;padding:18px;background:var(--bg);margin:10px 10px 0;border-radius:12px}
+.thumb svg{width:100%;height:100%}
+.body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
+.tag{font-size:13px;font-weight:600;display:flex;gap:8px;align-items:center}
+.tag i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.card h2{font-size:21px;line-height:1.2;margin:0}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.go{margin-top:auto;padding-top:10px;font-weight:600}
+.empty{color:var(--muted)}
+footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:48px;padding-top:18px}
+@media(max-width:700px){header{grid-template-columns:minmax(0,1fr)}.hero{max-height:180px}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<main class="band">
+  <header>
+    <div>
+      <h1>Luonnontieteiden mallit</h1>
+      <p class="lead">Interaktiivisia malleja kemian ja fysiikan ilmiöiden tutkimiseen ja harjoitteluun. Mallit toimivat selaimessa tietokoneella, iPadilla ja puhelimella, eikä niihin tarvitse kirjautua.</p>
+    </div>
+    <svg class="hero" viewBox="0 0 420 200" role="img" aria-label="Kuvituskuva: atomimalli ja aaltoliike">
+      <g fill="none" stroke-width="3">
+        <ellipse cx="110" cy="100" rx="90" ry="34" stroke="var(--fy)" opacity=".8"/>
+        <ellipse cx="110" cy="100" rx="90" ry="34" stroke="var(--ke)" opacity=".8" transform="rotate(60 110 100)"/>
+        <ellipse cx="110" cy="100" rx="90" ry="34" stroke="var(--line)" transform="rotate(120 110 100)"/>
+        <path d="M230 100 q20 -60 40 0 t40 0 t40 0 t40 0" stroke="var(--ink)"/>
+      </g>
+      <circle cx="110" cy="100" r="16" fill="var(--ke)"/>
+      <circle cx="196" cy="88" r="7" fill="var(--fy)"/><circle cx="62" cy="30" r="7" fill="var(--fy)"/><circle cx="68" cy="172" r="7" fill="var(--fy)"/>
+    </svg>
+  </header>
+
+  <nav class="filters" id="filters" aria-label="Suodata aineen mukaan"></nav>
+  <section class="grid" id="grid" aria-live="polite"></section>
+
+  <footer>Tekijä: Toni Pikkarainen. Mallit on tehty opetuskäyttöön.</footer>
+</main>
+
+<script>
+{
+// Lisää uusi malli tähän listaan. kuva = jokin THUMBS-avaimista (tai jätä pois).
+const MALLIT=[
+  {nimi:'Ioniyhdisteen muodostaja',aine:'Kemia',kurssi:'KE1',kuvaus:'Yhdistä positiivisia ja negatiivisia ioneja niin, että varaukset kumoavat toisensa. Harjoittelutilassa kirjoitetaan yhdisteen kaava.',url:'mallit/ioniyhdisteet.html',kuva:'ionit'},
+];
+const VARI={Kemia:'var(--ke)',Fysiikka:'var(--fy)',Biologia:'var(--bi)'};
+const THUMBS={
+  ionit:`<svg viewBox="0 0 240 110" aria-hidden="true">
+    <rect x="10" y="14" width="70" height="36" rx="7" fill="var(--ke)"/><rect x="82" y="14" width="70" height="36" rx="7" fill="var(--ke)"/>
+    <rect x="10" y="60" width="46" height="36" rx="7" fill="var(--fy)"/><rect x="58" y="60" width="46" height="36" rx="7" fill="var(--fy)"/><rect x="106" y="60" width="46" height="36" rx="7" fill="var(--fy)"/>
+    <text x="45" y="38" text-anchor="middle" font-size="15" font-weight="600" fill="#fff" font-family="Lexend,sans-serif">Al³⁺</text>
+    <text x="117" y="38" text-anchor="middle" font-size="15" font-weight="600" fill="#fff" font-family="Lexend,sans-serif">Al³⁺</text>
+    <text x="33" y="84" text-anchor="middle" font-size="14" font-weight="600" fill="#fff" font-family="Lexend,sans-serif">O²⁻</text>
+    <text x="81" y="84" text-anchor="middle" font-size="14" font-weight="600" fill="#fff" font-family="Lexend,sans-serif">O²⁻</text>
+    <text x="129" y="84" text-anchor="middle" font-size="14" font-weight="600" fill="#fff" font-family="Lexend,sans-serif">O²⁻</text>
+    <text x="196" y="66" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)" font-family="Lexend,sans-serif">Al₂O₃</text></svg>`,
+  oletus:`<svg viewBox="0 0 240 110" aria-hidden="true"><circle cx="120" cy="55" r="26" fill="var(--line)"/></svg>`
+};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let valittu='Kaikki';
+function filters(){
+  const aineet=['Kaikki',...new Set(MALLIT.map(m=>m.aine))];
+  document.getElementById('filters').innerHTML=aineet.length>2?aineet.map(a=>`<button aria-pressed="${a===valittu}" data-a="${esc(a)}">${esc(a)}</button>`).join(''):'';
+}
+function grid(){
+  const lista=MALLIT.filter(m=>valittu==='Kaikki'||m.aine===valittu);
+  document.getElementById('grid').innerHTML=lista.length?lista.map(m=>`
+    <a class="card" href="${esc(m.url)}">
+      <div class="thumb">${THUMBS[m.kuva]||THUMBS.oletus}</div>
+      <div class="body">
+        <span class="tag"><i style="background:${VARI[m.aine]||'var(--muted)'}"></i>${esc(m.aine)}${m.kurssi?' · '+esc(m.kurssi):''}</span>
+        <h2>${esc(m.nimi)}</h2>
+        <p>${esc(m.kuvaus)}</p>
+        <span class="go">Avaa malli →</span>
+      </div>
+    </a>`).join(''):'<p class="empty">Tähän aineeseen ei ole vielä malleja.</p>';
+}
+document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;valittu=b.dataset.a;filters();grid()});
+filters();grid();
+}
+</script>
+</body>
+</html>
