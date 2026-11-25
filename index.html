@@ -71,6 +71,7 @@ footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin
 // Lisää uusi malli tähän listaan. kuva = jokin THUMBS-avaimista (tai jätä pois).
 const MALLIT=[
   {nimi:'Ioniyhdisteen muodostaja',aine:'Kemia',kurssi:'KE1',kuvaus:'Yhdistä positiivisia ja negatiivisia ioneja niin, että varaukset kumoavat toisensa. Harjoittelutilassa kirjoitetaan yhdisteen kaava.',url:'mallit/ioniyhdisteet.html',kuva:'ionit'},
+  {nimi:'Alkuaineiden merkit',aine:'Kemia',kurssi:'KE1',kuvaus:'Opettele 34 alkuaineen nimet ja kemialliset merkit visalla, muistipelillä (myös kahdelle pelaajalle) tai taulukon avulla.',url:'mallit/alkuaineet.html',kuva:'alkuaineet'},
 ];
 const VARI={Kemia:'var(--ke)',Fysiikka:'var(--fy)',Biologia:'var(--bi)'};
 const THUMBS={
@@ -83,6 +84,14 @@ const THUMBS={
     <text x="81" y="84" text-anchor="middle" font-size="14" font-weight="600" fill="#fff" font-family="Lexend,sans-serif">O²⁻</text>
     <text x="129" y="84" text-anchor="middle" font-size="14" font-weight="600" fill="#fff" font-family="Lexend,sans-serif">O²⁻</text>
     <text x="196" y="66" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)" font-family="Lexend,sans-serif">Al₂O₃</text></svg>`,
+  alkuaineet:`<svg viewBox="0 0 240 110" aria-hidden="true" font-family="Lexend,sans-serif" text-anchor="middle">
+    <rect x="14" y="12" width="64" height="64" rx="9" fill="none" stroke="var(--ink)" stroke-width="3"/>
+    <text x="46" y="54" font-size="30" font-weight="700" fill="var(--ke)">Fe</text>
+    <text x="46" y="96" font-size="14" font-weight="600" fill="var(--fy)">rauta</text>
+    <rect x="96" y="12" width="64" height="64" rx="9" fill="var(--ink)"/><text x="128" y="54" font-size="28" font-weight="700" fill="var(--bg)">?</text>
+    <rect x="96" y="12" width="64" height="64" rx="9" fill="none"/>
+    <rect x="178" y="12" width="52" height="30" rx="8" fill="var(--ke)"/><text x="204" y="33" font-size="16" font-weight="700" fill="#fff">Au</text>
+    <rect x="178" y="48" width="52" height="30" rx="8" fill="var(--fy)"/><text x="204" y="68" font-size="13" font-weight="600" fill="#fff">kulta</text></svg>`,
   oletus:`<svg viewBox="0 0 240 110" aria-hidden="true"><circle cx="120" cy="55" r="26" fill="var(--line)"/></svg>`
 };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alkuaineiden merkit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: leikkisä mutta selkeä harjoitustyökalu luokkaan ja iPadille
+   IDEA: jaksollisen järjestelmän ruutu — iso merkki neliössä, nimi pienellä alla
+   PICTURE: visassa yksi iso alkuaineruutu kysymyksenä; muistipelissä ruuduista koottu pöytä
+   COLOUR and TYPE: valkoinen pohja, merkit punaoranssi, nimet sininen (sama kuin muissa malleissa); Lexend
+   LAYOUT: otsikko ja välilehdet, alla valittu tila; asetukset yhdellä rivillä */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#10151b);--ink:light-dark(#15191f,#e9edf2);--muted:light-dark(#56606b,#9ba7b3);
+--line:light-dark(#dfe4ea,#28323d);--panel:light-dark(#f3f5f8,#161d25);
+--s:light-dark(#d4421c,#ef6a40);--sT:light-dark(#fff,#1b0a04);--sS:light-dark(#fbe6df,#3a1d14);
+--n:light-dark(#1f5fbf,#5c9cff);--nT:light-dark(#fff,#06142b);--nS:light-dark(#e1ebfa,#14243d);
+--ok:light-dark(#1d7a46,#4fd18b);--bad:light-dark(#b3261e,#ff8a80)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Lexend,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(20px,3.5vw,48px) max(5vw,16px);max-width:1240px;margin:0 auto}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:500;text-decoration:none;padding:8px 0}
+.back:hover{color:var(--ink);text-decoration:underline}
+h1{font-size:clamp(28px,4vw,42px);line-height:1.05;margin:0 0 8px}
+.lead{margin:0 0 20px;color:var(--muted);max-width:62ch}
+.bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-bottom:22px}
+.seg{display:inline-flex;flex-wrap:wrap;border:2px solid var(--ink);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-weight:600;border:0;background:none;color:var(--ink);padding:9px 16px;min-height:44px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.seg.sm{border-width:1.5px}.seg.sm button{font-weight:500;font-size:15px;padding:8px 13px}
+.opt{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+button:focus-visible{outline:3px solid var(--n);outline-offset:2px}
+.btn{font:inherit;font-weight:600;min-height:48px;padding:8px 20px;border-radius:10px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+.btn.o{background:none;color:var(--ink)}
+.stage{background:var(--panel);border-radius:18px;padding:clamp(16px,3vw,32px)}
+/* visa */
+.quiz{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:clamp(20px,4vw,48px);align-items:center}
+.tile{aspect-ratio:1;border:3px solid var(--ink);border-radius:16px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;text-align:center}
+.tile .sym{font-size:clamp(72px,12vw,120px);font-weight:700;line-height:1;color:var(--s)}
+.tile .nm{font-size:clamp(26px,4vw,36px);font-weight:600;color:var(--n);overflow-wrap:anywhere}
+.tile .hid{font-size:18px;color:var(--muted);margin-top:10px}
+.qtext{font-size:20px;font-weight:500;margin:0 0 14px}
+.prog{font-size:14px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;gap:12px}
+.meter{height:6px;background:var(--line);border-radius:3px;margin-bottom:18px;overflow:hidden}.meter i{display:block;height:100%;background:var(--ink);transition:width .3s}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ans{font:inherit;font-size:22px;font-weight:600;min-height:64px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;padding:8px;display:flex;align-items:center;gap:10px;text-align:left}
+.ans kbd{font:500 13px Lexend,sans-serif;color:var(--muted);border:1.5px solid var(--line);border-radius:6px;padding:1px 7px;flex:none}
+.ans.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--bg))}
+.ans.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--bg))}
+.ans:disabled{cursor:default}
+.fb{min-height:56px;margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.fb p{margin:0;font-size:18px;font-weight:500}
+.fb .g{color:var(--ok)}.fb .b{color:var(--bad)}
+.end{text-align:center;padding:10px 0}
+.big{font-size:clamp(48px,8vw,72px);font-weight:700;line-height:1}
+.missed{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:18px 0}
+.chip{border:2px solid var(--line);border-radius:10px;padding:6px 12px;background:var(--bg);font-weight:500}
+.chip b{color:var(--s);margin-right:6px}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+/* muistipeli */
+.mhead{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.stats{display:flex;gap:18px;font-size:15px;color:var(--muted)}.stats b{color:var(--ink);font-size:20px;font-variant-numeric:tabular-nums}
+.stats .on{color:var(--ink)}.stats .on b{text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:4px}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.card{aspect-ratio:1;display:block;width:100%;border:0;padding:0;background:none;cursor:pointer;font:inherit}
+.in{display:block;position:relative;width:100%;height:100%}
+.face{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:6px;text-align:center}
+.back-f{background:var(--ink);color:var(--bg);font-size:28px;font-weight:700;
+  background-image:radial-gradient(circle at 30% 30%,rgba(255,255,255,.14) 0 18%,transparent 19%),radial-gradient(circle at 70% 70%,rgba(255,255,255,.1) 0 12%,transparent 13%)}
+.front{display:none;border:2.5px solid var(--line);background:var(--bg)}
+.card.open .back-f,.card.done .back-f{display:none}
+.card.open .front,.card.done .front{display:flex;animation:pop .22s ease-out}
+@keyframes pop{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.card.s .front{color:var(--s);font-size:clamp(30px,5vw,40px);font-weight:700}
+.card.n .front{color:var(--n);font-size:15px;font-weight:600;overflow-wrap:anywhere;line-height:1.15}
+.card.done.s .front{background:var(--s);color:var(--sT);border-color:var(--s)}
+.card.done.n .front{background:var(--n);color:var(--nT);border-color:var(--n)}
+.card.done{cursor:default}
+.win{margin-top:18px;font-size:20px;font-weight:600;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+/* taulukko */
+.ptab{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.pt{font:inherit;aspect-ratio:1;border:2.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px}
+.pt .ps{font-size:34px;font-weight:700;color:var(--s);line-height:1}
+.pt .pn{font-size:14px;font-weight:500;color:var(--n);min-height:1.3em;overflow-wrap:anywhere}
+.pt.hide .pn{visibility:hidden}
+.note{font-size:14px;color:var(--muted);margin:14px 0 0}
+@media(max-width:640px){.quiz{grid-template-columns:minmax(0,1fr)}.tile{max-width:220px;margin:0 auto;width:100%}.opts{grid-template-columns:minmax(0,1fr)}
+  .board{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.card.n .front{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.meter i{transition:none}.card .front{animation:none}}
+</style>
+</head>
+<body>
+<main class="band">
+  <a class="back" href="../index.html">← Kaikki mallit</a>
+  <h1>Alkuaineiden merkit</h1>
+  <p class="lead">Harjoittele 34 yleisen alkuaineen nimiä ja kemiallisia merkkejä visalla, muistipelillä tai taulukon avulla.</p>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Tila">
+      <button data-mode="visa" aria-pressed="true">Visa</button>
+      <button data-mode="muisti" aria-pressed="false">Muistipeli</button>
+      <button data-mode="taulu" aria-pressed="false">Taulukko</button>
+    </div>
+    <div class="opt">Alkuaineet
+      <div class="seg sm" role="group" aria-label="Alkuainejoukko">
+        <button data-set="all" aria-pressed="true">Kaikki 34</button>
+        <button data-set="a" aria-pressed="false">H–Ca</button>
+        <button data-set="b" aria-pressed="false">Ti–U</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="stage" id="stage" aria-live="polite"></section>
+</main>
+
+<script>
+{
+const E=[['vety','H'],['helium','He'],['litium','Li'],['hiili','C'],['typpi','N'],['happi','O'],['fluori','F'],['neon','Ne'],['natrium','Na'],
+['magnesium','Mg'],['alumiini','Al'],['pii','Si'],['fosfori','P'],['rikki','S'],['kloori','Cl'],['kalium','K'],['kalsium','Ca'],
+['titaani','Ti'],['kromi','Cr'],['rauta','Fe'],['nikkeli','Ni'],['kupari','Cu'],['sinkki','Zn'],['strontium','Sr'],['hopea','Ag'],
+['tina','Sn'],['jodi','I'],['ksenon','Xe'],['platina','Pt'],['kulta','Au'],['elohopea','Hg'],['lyijy','Pb'],['radon','Rn'],['uraani','U']]
+.map(([n,s],i)=>({i,n,s}));
+const $=id=>document.getElementById(id);
+const st={mode:'visa',set:'all'};
+const pool=()=>st.set==='a'?E.slice(0,17):st.set==='b'?E.slice(17):E;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const cap=t=>t[0].toUpperCase()+t.slice(1);
+
+/* ---------- VISA ---------- */
+const q={len:10,dir:'mix',list:[],i:0,score:0,wrong:[],answered:false,cur:null};
+function distractors(el){
+  const sc=x=>(x.s[0]===el.s[0]?3:0)+(x.n[0]===el.n[0]?2:0)+([...x.s.toLowerCase()].some(c=>el.s.toLowerCase().includes(c))?1:0)+Math.random()*2;
+  const c=E.filter(x=>x!==el).sort((a,b)=>sc(b)-sc(a));
+  return shuffle(c.slice(0,6)).slice(0,3);
+}
+function startQuiz(list){
+  q.list=list||shuffle(pool()).slice(0,Math.min(q.len,pool().length));
+  q.i=0;q.score=0;q.wrong=[];showQ();
+}
+function showQ(){
+  if(q.i>=q.list.length)return endQuiz();
+  const el=q.list[q.i],d=q.dir==='mix'?(Math.random()<.5?'ns':'sn'):q.dir;
+  q.cur={el,d,opts:shuffle([el,...distractors(el)])};q.answered=false;
+  const pct=q.i/q.list.length*100;
+  $('stage').innerHTML=`
+    <div class="mhead" style="margin-bottom:18px">
+      <div class="seg sm" role="group" aria-label="Kysymyksen suunta">
+        ${[['ns','Nimi → merkki'],['sn','Merkki → nimi'],['mix','Sekaisin']].map(([v,t])=>`<button data-dir="${v}" aria-pressed="${q.dir===v}">${t}</button>`).join('')}
+      </div>
+      <div class="seg sm" role="group" aria-label="Kysymysten määrä">
+        ${[10,20].map(v=>`<button data-len="${v}" aria-pressed="${q.len===v}">${v} kysymystä</button>`).join('')}
+      </div>
+    </div>
+    <div class="quiz">
+      <div class="tile">${d==='ns'?`<span class="nm">${el.n}</span><span class="hid">merkki?</span>`:`<span class="sym">${el.s}</span><span class="hid">nimi?</span>`}</div>
+      <div>
+        <div class="prog"><span>Kysymys ${q.i+1} / ${q.list.length}</span><span>Oikein ${q.score}</span></div>
+        <div class="meter"><i style="width:${pct}%"></i></div>
+        <p class="qtext">${d==='ns'?`Mikä on alkuaineen <b>${el.n}</b> kemiallinen merkki?`:`Mikä alkuaine on <b>${el.s}</b>?`}</p>
+        <div class="opts">${q.cur.opts.map((o,k)=>`<button class="ans" data-k="${k}"><kbd>${k+1}</kbd>${d==='ns'?o.s:o.n}</button>`).join('')}</div>
+        <div class="fb" id="fb"></div>
+      </div>
+    </div>`;
+}
+function answer(k){
+  if(q.answered)return;q.answered=true;
+  const {el,opts}=q.cur,ok=opts[k]===el;
+  document.querySelectorAll('.ans').forEach((b,j)=>{b.disabled=true;if(opts[j]===el)b.classList.add('right');else if(j===k)b.classList.add('wrong')});
+  if(ok)q.score++;else q.wrong.push(el);
+  $('fb').innerHTML=`<p class="${ok?'g':'b'}">${ok?'Oikein!':`Ei aivan. ${cap(el.n)} = ${el.s}`}</p><button class="btn" id="next">${q.i+1<q.list.length?'Seuraava':'Tulokset'} →</button>`;
+  $('next').focus({preventScroll:true});
+}
+function endQuiz(){
+  const n=q.list.length,r=q.score/n;
+  const msg=r===1?'Täydellinen kierros!':r>=.8?'Hienoa, melkein kaikki oikein.':r>=.5?'Hyvä alku. Harjoittele vielä virheitä.':'Harjoittele lisää, esimerkiksi taulukon avulla.';
+  $('stage').innerHTML=`<div class="end">
+    <div class="big">${q.score} / ${n}</div><p class="qtext" style="margin-top:10px">${msg}</p>
+    ${q.wrong.length?`<p style="color:var(--muted);margin:0">Harjoiteltavat:</p><div class="missed">${q.wrong.map(e=>`<span class="chip"><b>${e.s}</b>${e.n}</span>`).join('')}</div>`:''}
+    <div class="row">${q.wrong.length?'<button class="btn" id="retryW">Harjoittele virheet</button>':''}<button class="btn ${q.wrong.length?'o':''}" id="again">Uusi kierros</button></div></div>`;
+}
+
+/* ---------- MUISTIPELI ---------- */
+const m={pairs:8,players:1,cards:[],open:[],lock:false,found:0,moves:0,turn:0,pts:[0,0],t0:0,sec:0};
+let tick=null;
+function startMem(){
+  clearInterval(tick);
+  const els=shuffle(pool()).slice(0,Math.min(m.pairs,pool().length));
+  m.cards=shuffle(els.flatMap(e=>[{e,k:'n'},{e,k:'s'}]));
+  Object.assign(m,{open:[],lock:false,found:0,moves:0,turn:0,pts:[0,0],t0:0,sec:0});
+  drawMem();
+}
+function stats(){
+  if(m.players===1)return `<span>Siirrot <b>${m.moves}</b></span><span>Parit <b>${m.found}/${m.cards.length/2}</b></span><span>Aika <b id="time">${fmt(m.sec)}</b></span>`;
+  return [0,1].map(p=>`<span class="${m.turn===p&&m.found<m.cards.length/2?'on':''}">Pelaaja ${p+1} <b>${m.pts[p]}</b></span>`).join('')+`<span>Parit <b>${m.found}/${m.cards.length/2}</b></span>`;
+}
+const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+function drawMem(){
+  $('stage').innerHTML=`
+    <div class="mhead">
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <div class="seg sm" role="group" aria-label="Parien määrä">${[6,8,10,12].map(v=>`<button data-pairs="${v}" aria-pressed="${m.pairs===v}">${v} paria</button>`).join('')}</div>
+        <div class="seg sm" role="group" aria-label="Pelaajat">${[1,2].map(v=>`<button data-pl="${v}" aria-pressed="${m.players===v}">${v} pelaaja${v>1?'a':''}</button>`).join('')}</div>
+      </div>
+      <div class="stats" id="stats">${stats()}</div>
+    </div>
+    <div class="board" id="board">${m.cards.map((c,i)=>`<button class="card ${c.k}" data-c="${i}" aria-label="Kortti ${i+1}"><span class="in"><span class="face back-f">?</span><span class="face front">${c.k==='s'?c.e.s:c.e.n}</span></span></button>`).join('')}</div>
+    <div id="win"></div>`;
+}
+function flip(i){
+  const c=m.cards[i],btn=document.querySelector(`[data-c="${i}"]`);
+  if(m.lock||c.done||m.open.includes(i))return;
+  if(!m.t0&&m.players===1){m.t0=Date.now();tick=setInterval(()=>{m.sec=Math.floor((Date.now()-m.t0)/1000);const t=$('time');if(t)t.textContent=fmt(m.sec)},1000)}
+  btn.classList.add('open');btn.setAttribute('aria-label',c.k==='s'?c.e.s:c.e.n);m.open.push(i);
+  if(m.open.length<2)return;
+  m.moves++;const [a,b]=m.open.map(j=>m.cards[j]);
+  if(a.e===b.e&&a.k!==b.k){
+    a.done=b.done=true;m.found++;m.pts[m.turn]++;
+    m.open.forEach(j=>{const x=document.querySelector(`[data-c="${j}"]`);x.classList.add('done')});
+    m.open=[];
+    if(m.found===m.cards.length/2)finishMem();
+  }else{
+    m.lock=true;
+    setTimeout(()=>{m.open.forEach(j=>{const x=document.querySelector(`[data-c="${j}"]`);if(x){x.classList.remove('open');x.setAttribute('aria-label','Kortti '+(j+1))}});m.open=[];m.lock=false;if(m.players===2)m.turn=1-m.turn;$('stats').innerHTML=stats()},1100);
+  }
+  $('stats').innerHTML=stats();
+}
+function finishMem(){
+  clearInterval(tick);
+  const t=m.players===1?`Kaikki parit löytyivät ${m.moves} siirrolla, aika ${fmt(m.sec)}.`
+    :m.pts[0]===m.pts[1]?`Tasapeli ${m.pts[0]}–${m.pts[1]}!`:`Pelaaja ${m.pts[0]>m.pts[1]?1:2} voitti ${Math.max(...m.pts)}–${Math.min(...m.pts)}!`;
+  $('win').innerHTML=`<div class="win">${t}<button class="btn" id="memAgain">Uusi peli</button></div>`;
+  $('stats').innerHTML=stats();
+}
+
+/* ---------- TAULUKKO ---------- */
+let hideNames=false;
+function drawTable(){
+  $('stage').innerHTML=`
+    <div class="mhead"><p style="margin:0;color:var(--muted)">Peitä nimet ja testaa itseäsi: napauta ruutua nähdäksesi nimen.</p>
+      <button class="btn o" id="toggleN">${hideNames?'Näytä kaikki nimet':'Piilota nimet'}</button></div>
+    <div class="ptab">${pool().map(e=>`<button class="pt${hideNames?' hide':''}" data-pt="${e.i}"><span class="ps">${e.s}</span><span class="pn">${e.n}</span></button>`).join('')}</div>
+    <p class="note">Järjestys on sama kuin oppikirjan taulukossa.</p>`;
+}
+
+/* ---------- ohjaus ---------- */
+function show(){
+  clearInterval(tick);
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===st.mode));
+  document.querySelectorAll('[data-set]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.set===st.set));
+  if(st.mode==='visa')startQuiz();else if(st.mode==='muisti')startMem();else drawTable();
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+  if(d.mode){st.mode=d.mode;show()}
+  else if(d.set){st.set=d.set;show()}
+  else if(d.k!==undefined&&t.classList.contains('ans'))answer(+d.k);
+  else if(t.id==='next'){q.i++;showQ()}
+  else if(d.dir){q.dir=d.dir;startQuiz()}
+  else if(d.len){q.len=+d.len;startQuiz()}
+  else if(t.id==='again')startQuiz();
+  else if(t.id==='retryW')startQuiz(shuffle(q.wrong));
+  else if(d.c!==undefined)flip(+d.c);
+  else if(d.pairs){m.pairs=+d.pairs;startMem()}
+  else if(d.pl){m.players=+d.pl;startMem()}
+  else if(t.id==='memAgain')startMem();
+  else if(t.id==='toggleN'){hideNames=!hideNames;drawTable()}
+  else if(d.pt!==undefined&&hideNames)t.classList.toggle('hide');
+});
+document.addEventListener('keydown',e=>{
+  if(st.mode!=='visa'||e.altKey||e.ctrlKey||e.metaKey)return;
+  if(/^[1-4]$/.test(e.key)&&!q.answered&&document.querySelector('.ans')){answer(+e.key-1)}
+});
+show();
+}
+</script>
+</body>
+</html>
