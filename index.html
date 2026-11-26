@@ -71,7 +71,8 @@ footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin
 // Lisää uusi malli tähän listaan. kuva = jokin THUMBS-avaimista (tai jätä pois).
 const MALLIT=[
   {nimi:'Ioniyhdisteen muodostaja',aine:'Kemia',kurssi:'KE1',kuvaus:'Yhdistä positiivisia ja negatiivisia ioneja niin, että varaukset kumoavat toisensa. Harjoittelutilassa kirjoitetaan yhdisteen kaava.',url:'mallit/ioniyhdisteet.html',kuva:'ionit'},
-  {nimi:'Alkuaineiden merkit',aine:'Kemia',kurssi:'KE1',kuvaus:'Opettele 34 alkuaineen nimet ja kemialliset merkit visalla, muistipelillä (myös kahdelle pelaajalle) tai taulukon avulla.',url:'mallit/alkuaineet.html',kuva:'alkuaineet'},
+  {nimi:'Alkuaineiden merkit',aine:'Kemia',kurssi:'KE1',kuvaus:'Opettele 34 alkuaineen nimet ja kemialliset merkit visalla (vaihtoehdoista tai kirjoittaen), muistipelillä (myös kahdelle pelaajalle) tai taulukon avulla.',url:'mallit/alkuaineet.html',kuva:'alkuaineet'},
+  {nimi:'Hiilihydraattien tunnistaminen',aine:'Kemia',kurssi:'Hiilihydraatit',kuvaus:'Virtuaalilaboratorio: osoita pelkistävät sokerit kuparisulfaattikokeella ja tärkkelys jodiliuoksella työohjeen vaiheiden mukaan.',url:'mallit/hiilihydraatit.html',kuva:'putket'},
 ];
 const VARI={Kemia:'var(--ke)',Fysiikka:'var(--fy)',Biologia:'var(--bi)'};
 const THUMBS={
@@ -92,6 +93,9 @@ const THUMBS={
     <rect x="96" y="12" width="64" height="64" rx="9" fill="none"/>
     <rect x="178" y="12" width="52" height="30" rx="8" fill="var(--ke)"/><text x="204" y="33" font-size="16" font-weight="700" fill="#fff">Au</text>
     <rect x="178" y="48" width="52" height="30" rx="8" fill="var(--fy)"/><text x="204" y="68" font-size="13" font-weight="600" fill="#fff">kulta</text></svg>`,
+  putket:`<svg viewBox="0 0 240 110" aria-hidden="true">
+    ${[['#2752c9',0],['#a6391b',1],['#d9a823',0],['#191a36',0],['#e0b056',0]].map(([c,sed],i)=>{const x=40+40*i;return `<path d="M${x-12} 10 V84 a12 12 0 0 0 24 0 V10" fill="none" stroke="var(--muted)" stroke-width="2.5"/><path d="M${x-10.5} 50 V84 a10.5 10.5 0 0 0 21 0 V50Z" fill="${c}" opacity=".9"/>`}).join('')}
+    <path d="M18 34 H222 M18 84 H222" stroke="var(--muted)" stroke-width="2.5"/></svg>`,
   oletus:`<svg viewBox="0 0 240 110" aria-hidden="true"><circle cx="120" cy="55" r="26" fill="var(--line)"/></svg>`
 };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hiilihydraattien tunnistaminen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: rauhallinen virtuaalilaboratorio, joka seuraa oppikirjan työohjetta vaihe vaiheelta
+   IDEA: koeputkiteline A–E — sama kuva kuin työohjeessa, mutta värit muuttuvat oikeasti
+   PICTURE: iso SVG-teline viidellä putkella, vesihaude ja pisarat; värit liukuvat vaiheesta toiseen
+   COLOUR and TYPE: valkoinen pohja, lasin harmaa, reagenssien omat värit (kuparin sininen, Cu2O:n punaruskea, jodin ruskea); Lexend
+   LAYOUT: otsikko ja välilehdet, teline vasemmalla + työvaiheet oikealla, alla havaintojen kirjaus */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#10151b);--ink:light-dark(#15191f,#e9edf2);--muted:light-dark(#56606b,#9ba7b3);
+--line:light-dark(#dfe4ea,#28323d);--panel:light-dark(#f3f5f8,#161d25);--glass:light-dark(#5d6873,#a9b4bf);
+--acc:light-dark(#1f5fbf,#5c9cff);--ok:light-dark(#1d7a46,#4fd18b);--bad:light-dark(#b3261e,#ff8a80);--warn:light-dark(#8a4b00,#ffb85c)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Lexend,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(20px,3.5vw,48px) max(5vw,16px);max-width:1240px;margin:0 auto}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);font-weight:500;text-decoration:none;padding:8px 0}
+.back:hover{color:var(--ink);text-decoration:underline}
+h1{font-size:clamp(28px,4vw,42px);line-height:1.05;margin:0 0 8px}
+.lead{margin:0 0 20px;color:var(--muted);max-width:66ch}
+.seg{display:inline-flex;flex-wrap:wrap;border:2px solid var(--ink);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.seg button{font:inherit;font-weight:600;border:0;background:none;color:var(--ink);padding:10px 18px;min-height:44px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+button:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.lab{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(16px,3vw,32px);align-items:start}
+.stage{background:var(--panel);border-radius:18px;padding:clamp(10px,2vw,20px)}
+.stage svg{width:100%;height:auto;display:block}
+.picks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:4px}
+.picks label{font-size:12px;color:var(--muted);text-align:center;display:block}
+.picks select{width:100%;font:500 14px Lexend,sans-serif;min-height:44px;border-radius:9px;border:2px solid var(--line);background:var(--bg);color:var(--ink);padding:4px 2px;text-align:center}
+.picks select:disabled{opacity:1;border-color:transparent;background:none;appearance:none;-webkit-appearance:none}
+.steps h2{font-size:20px;margin:0 0 12px}
+.steps ol{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:10px 0 10px 44px;border-top:1px solid var(--line);color:var(--muted)}
+.steps li::before{content:counter(s);position:absolute;left:0;top:9px;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px}
+.steps li.done{color:var(--ink)}.steps li.done::before{content:"✓";background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.steps li.cur{color:var(--ink);font-weight:500}.steps li.cur::before{border-color:var(--ink);color:var(--ink)}
+.warn{display:block;font-size:14px;color:var(--warn);margin-top:4px;font-weight:500}
+.btn{font:inherit;font-weight:600;min-height:48px;padding:8px 20px;border-radius:10px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer;margin-top:10px}
+.btn.o{background:none;color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.clock{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:8px}
+.clock small{font-size:14px;font-weight:400;color:var(--muted);margin-left:8px}
+.obs{margin-top:28px;border-top:2px solid var(--ink);padding-top:18px}
+.obs h2{font-size:22px;margin:0 0 6px}
+.obs .q{color:var(--muted);margin:0 0 14px}
+.orow{display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr);gap:8px 16px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.orow .who{font-weight:600}.orow .who span{color:var(--muted);font-weight:500;margin-right:6px}
+.choice{display:flex;flex-wrap:wrap;gap:8px}
+.choice button{font:inherit;font-weight:500;min-height:44px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:8px}
+.choice button i{width:16px;height:16px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.2)}
+.choice button[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.res{grid-column:2;font-size:15px;margin:0}
+.res.g{color:var(--ok)}.res.b{color:var(--bad)}.res span{color:var(--ink)}
+.concl{background:var(--panel);border-radius:14px;padding:16px 20px;margin-top:18px}
+.concl p{margin:0 0 6px}
+details{margin-top:24px;border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+details p{max-width:70ch}
+@keyframes fall{from{transform:translateY(0);opacity:1}85%{opacity:1}to{transform:translateY(var(--d));opacity:0}}
+.drop{animation:fall .55s ease-in forwards}
+@keyframes steam{0%{opacity:0;transform:translateY(10px)}40%{opacity:.6}100%{opacity:0;transform:translateY(-22px)}}
+.steam path{animation:steam 2.4s ease-out infinite}.steam path:nth-child(2){animation-delay:.8s}.steam path:nth-child(3){animation-delay:1.6s}
+@media(max-width:820px){.lab{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:520px){.orow{grid-template-columns:minmax(0,1fr)}.res{grid-column:1}.picks select{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.drop{animation-duration:.01s}.steam path{animation:none;opacity:.4}}
+</style>
+</head>
+<body>
+<main class="band">
+  <a class="back" href="../index.html">← Kaikki mallit</a>
+  <h1>Hiilihydraattien tunnistaminen</h1>
+  <p class="lead">Tee työ vaihe vaiheelta kuten työohjeessa ja seuraa, miten koeputkien värit muuttuvat. Kirjaa lopuksi havaintosi ja tarkista ne.</p>
+
+  <div class="seg" role="group" aria-label="Työ">
+    <button data-exp="trommer" aria-pressed="true">Yksinkertaisen sokerin osoittaminen</button>
+    <button data-exp="jodi" aria-pressed="false">Tärkkelyksen osoittaminen jodiliuoksella</button>
+  </div>
+
+  <div class="lab">
+    <div class="stage">
+      <svg id="svg" viewBox="0 0 600 360" role="img" aria-label="Koeputkiteline, jossa viisi koeputkea A–E"></svg>
+      <div class="picks" id="picks"></div>
+    </div>
+    <div class="steps" id="steps"></div>
+  </div>
+
+  <section class="obs" id="obs" hidden></section>
+
+  <details>
+    <summary>Mitä koeputkissa tapahtuu?</summary>
+    <p><b>Kuparisulfaattikoe (Trommerin koe).</b> Natriumhydroksidi ja kuparisulfaatti muodostavat sinistä kupari(II)hydroksidia. Pelkistävä sokeri, kuten glukoosi tai fruktoosi, pelkistää kuumennettaessa sinisen Cu²⁺-ionin kupari(I)oksidiksi Cu₂O, joka näkyy punaruskeana sakkana. Väri muuttuu usein vihreän ja keltaisen kautta. Sakkaroosi ja tärkkelys eivät ole pelkistäviä, joten niissä seos pysyy sinisenä.</p>
+    <p><b>Jodikoe.</b> Tärkkelyksen amyloosi on kierteinen ketju, jonka sisään jodi asettuu. Syntyy voimakas sinimusta väri. Sokerit eivät muodosta tällaista kierrettä, joten jodiliuos jää kellanruskeaksi.</p>
+    <p><b>Huomio todellisesta työstä.</b> Kun vertailuputken sinistä kupari(II)hydroksidia kuumennetaan, se voi tummua mustaksi kupari(II)oksidiksi CuO. Musta väri ei tarkoita sokeria.</p>
+  </details>
+</main>
+
+<script>
+{
+const SUB={
+  glukoosi:{n:'glukoosi',red:1,sug:1,pc:'#f7f7f3',t:'Glukoosi on monosakkaridi ja pelkistävä sokeri. Se pelkistää sinisen Cu²⁺-ionin punaruskeaksi kupari(I)oksidiksi Cu₂O.'},
+  fruktoosi:{n:'fruktoosi',red:1.1,sug:1,pc:'#f7f7f3',t:'Fruktoosi on monosakkaridi. Emäksisessä liuoksessa se toimii pelkistävänä sokerina ja antaa punaruskean sakan.'},
+  sakkaroosi:{n:'sakkaroosi',sug:1,pc:'#f7f7f3',t:'Sakkaroosi on disakkaridi (glukoosi + fruktoosi). Sokereiden pelkistävät ryhmät ovat kiinni niiden välisessä sidoksessa, joten seos pysyy sinisenä.'},
+  laktoosi:{n:'laktoosi',red:.85,sug:1,pc:'#f7f7f3',t:'Laktoosi (maitosokeri) on disakkaridi, mutta toisin kuin sakkaroosi se on pelkistävä sokeri, joten punaruskea sakka muodostuu.'},
+  hunaja:{n:'hunaja',red:1,sug:1,pc:'#e3a63c',t:'Hunaja sisältää pääosin glukoosia ja fruktoosia, joten koe on positiivinen.'},
+  perunajauho:{n:'perunajauho',st:1,pc:'#ffffff',t:'Perunajauho on tärkkelystä eli polysakkaridia. Se ei pelkistä kuparia, joten seos pysyy sinisenä.',j:'Perunajauho on tärkkelystä. Jodi asettuu amyloosin kierteeseen, ja seos muuttuu sinimustaksi.'},
+  maissitarkkelys:{n:'maissitärkkelys',st:1,pc:'#ffffff',t:'Maissitärkkelys on polysakkaridia. Se ei pelkistä kuparia, joten seos pysyy sinisenä.',j:'Maissitärkkelys on tärkkelystä, joten jodiliuos muuttaa sen sinimustaksi.'},
+  vesi:{n:'vesi',t:'Vesi on vertailunäyte (nollakoe). Siinä ei ole sokeria, joten seos pysyy sinisenä.',j:'Vesi on vertailunäyte. Jodiliuos vain laimenee kellanruskeaksi.'}
+};
+const EXP={
+  trommer:{tubes:['glukoosi','fruktoosi','sakkaroosi','perunajauho','vesi'],title:'Yksinkertaisen sokerin osoittaminen',
+    steps:[
+      {t:'Ota koeputkiin lusikankärjellinen ainetta ja muutama pisara vettä.',b:'Lisää aineet'},
+      {t:'Lisää pipetillä puoli koeputkellista kuumaa vettä ja sekoita ravistelemalla.',b:'Lisää vesi'},
+      {t:'Lisää 5 pisaraa natriumhydroksidiliuosta (NaOH).',w:'NaOH on syövyttävää. Käytä suojalaseja.',b:'Lisää NaOH',drop:'#d9e6ef'},
+      {t:'Lisää pari pisaraa kuparisulfaattiliuosta (CuSO₄).',b:'Lisää CuSO₄',drop:'#2f6fd6'},
+      {t:'Aseta koeputket kiehuvaan vesihauteeseen ja tarkkaile noin 5 minuuttia.',w:'Varo kuumaa vettä.',b:'Aloita lämmitys',heat:1}],
+    obs:[['Sininen','#3f6fd0'],['Punaruskea sakka','#a6391b']],pos:s=>!!SUB[s].red,
+    q:'Mikä oli koeputken väri 5 minuutin lämmityksen jälkeen?'},
+  jodi:{tubes:['perunajauho','glukoosi','sakkaroosi','hunaja','maissitarkkelys'],title:'Tärkkelyksen osoittaminen jodiliuoksella',
+    steps:[
+      {t:'Ota tutkittavia aineita koeputkiin. Yhteen putkeen tulee vertailunäytteeksi perunajauhoa.',b:'Lisää aineet'},
+      {t:'Lisää koeputkiin puoli koeputkellista vettä ja sekoita.',b:'Lisää vesi'},
+      {t:'Lisää jokaiseen koeputkeen pisara jodiliuosta.',b:'Lisää jodiliuos',drop:'#8a4b12'}],
+    obs:[['Kellanruskea','#d9a64a'],['Sinimusta','#1c1d3b']],pos:s=>!!SUB[s].st,
+    q:'Minkä värinen seos oli jodiliuoksen lisäämisen jälkeen?'}
+};
+const X=i=>60+120*i, TOP=42, BOT=318, HALF=180;
+const st={exp:'trommer',tubes:[],phase:0,t:0,heating:false,busy:false,obs:[],checked:false};
+const cur=[],$=id=>document.getElementById(id);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hex=h=>[1,3,5].map(k=>parseInt(h.slice(k,k+2),16));
+const toHex=a=>'#'+a.map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+const mix=(a,b,f)=>toHex(hex(a).map((v,k)=>v+(hex(b)[k]-v)*f));
+const cl=v=>Math.max(0,Math.min(1,v));
+const RAMP=[[0,'#2752c9'],[.22,'#2f8f86'],[.42,'#9db536'],[.58,'#d9a823'],[.78,'#d26a1f'],[1,'#a6391b']];
+function ramp(f){for(let k=1;k<RAMP.length;k++)if(f<=RAMP[k][0]){const [a,c1]=RAMP[k-1],[b,c2]=RAMP[k];return mix(c1,c2,(f-a)/(b-a))}return RAMP[RAMP.length-1][1]}
+
+function target(i){
+  const s=SUB[st.tubes[i]],ph=st.phase,e=st.exp;
+  const g={lvl:BOT+2,col:'#d6e9f7',op:0,sed:0,sedCol:'#3c78c8',pow:ph>=1&&s.pc?1:0,pc:s.pc||'#ffffff',bath:0};
+  if(ph>=2){g.lvl=HALF;g.pow=0;if(s.st){g.col='#e7e9ec';g.op=.92}else{g.col='#d6e9f7';g.op=.35}}
+  if(e==='trommer'&&ph>=4){
+    if(s.sug){g.col='#2752c9';g.op=.86}else{g.col='#79aee8';g.op=.88;g.sed=7}
+    if(s.red){const f=cl(st.t*s.red);g.col=ramp(f);g.op=.86+.08*f;g.sed=24*cl((f-.45)/.45);g.sedCol='#8f2f15'}
+  }
+  if(e==='trommer'&&(st.heating||ph>=5))g.bath=1;
+  if(e==='jodi'&&ph>=3){if(s.st){g.col='#191a36';g.op=.96}else{g.col='#e0b056';g.op=.6}}
+  return g;
+}
+function build(){
+  const tube=x=>`M${x-24},${TOP} V${BOT-24} a24 24 0 0 0 48 0 V${TOP}`;
+  let h=`<defs>${[0,1,2,3,4].map(i=>`<clipPath id="c${i}"><path d="${tube(X(i))}"/></clipPath>`).join('')}</defs>
+  <ellipse cx="300" cy="346" rx="280" ry="12" fill="var(--line)"/>
+  <rect id="bath" x="10" y="150" width="580" height="188" rx="20" fill="#9cc9ea" fill-opacity=".28" stroke="var(--glass)" stroke-width="2.5" opacity="0"/>
+  <g class="steam" id="steam" opacity="0" fill="none" stroke="var(--glass)" stroke-width="3" stroke-linecap="round">
+    <path d="M150 140 q-10 -14 0 -28 t0 -28"/><path d="M300 140 q-10 -14 0 -28 t0 -28"/><path d="M450 140 q-10 -14 0 -28 t0 -28"/></g>`;
+  for(let i=0;i<5;i++){const x=X(i);
+    h+=`<g clip-path="url(#c${i})">
+      <rect id="l${i}" x="${x-26}" width="52" y="${BOT+2}" height="0"/>
+      <rect id="s${i}" x="${x-26}" width="52" y="${BOT+2}" height="0"/>
+      <ellipse id="p${i}" cx="${x}" cy="${BOT+6}" rx="18" ry="10" opacity="0"/></g>
+      <path d="${tube(x)}" fill="none" stroke="var(--glass)" stroke-width="3"/>
+      <path d="M${x-14},${TOP+14} V${BOT-30}" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+      <text x="${x}" y="${TOP-12}" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)" font-family="Lexend,sans-serif">${'ABCDE'[i]}</text>
+      <g id="d${i}"></g>`;
+  }
+  h+=`<g fill="none" stroke="var(--glass)" stroke-width="3" opacity=".9"><path d="M12 112 H588 M12 266 H588 M12 112 V330 M588 112 V330 M12 330 H588"/></g>`;
+  $('svg').innerHTML=h;
+  for(let i=0;i<5;i++)cur[i]=target(i);
+  apply();
+}
+function apply(){
+  for(let i=0;i<5;i++){const c=cur[i];
+    const l=$('l'+i);l.setAttribute('y',c.lvl);l.setAttribute('height',Math.max(0,BOT+4-c.lvl));l.setAttribute('fill',c.col);l.setAttribute('fill-opacity',c.op);
+    const s=$('s'+i);s.setAttribute('y',BOT+1-c.sed);s.setAttribute('height',c.sed+3);s.setAttribute('fill',c.sedCol);s.setAttribute('opacity',c.sed>.5?1:0);
+    const p=$('p'+i);p.setAttribute('fill',c.pc);p.setAttribute('opacity',c.pow);p.setAttribute('stroke','#c9ced4');
+  }
+  $('bath').setAttribute('opacity',cur[0].bath);$('steam').setAttribute('opacity',cur[0].bath>.5?1:0);
+}
+let running=false,last=0;
+function loop(ts){
+  const dt=last?ts-last:16;last=ts;
+  if(st.heating){st.t=Math.min(1,st.t+dt/9000);updClock();if(st.t>=1){st.heating=false;st.phase=EXP.trommer.steps.length;render()}}
+  let moving=st.heating;const k=reduce?1:Math.min(1,dt/180);
+  for(let i=0;i<5;i++){const t=target(i),c=cur[i];
+    for(const p of ['lvl','op','sed','pow','bath']){c[p]+=(t[p]-c[p])*k;if(Math.abs(t[p]-c[p])>.01)moving=true}
+    if(c.col!==t.col){c.col=reduce?t.col:mix(c.col,t.col,Math.min(1,k*1.4));if(hex(c.col).some((v,j)=>Math.abs(v-hex(t.col)[j])>3))moving=true;else c.col=t.col}
+    c.sedCol=t.sedCol;c.pc=t.pc;
+  }
+  apply();
+  if(moving)requestAnimationFrame(loop);else{running=false;last=0}
+}
+function kick(){if(!running){running=true;last=0;requestAnimationFrame(loop)}}
+function updClock(){const c=$('clock');if(!c)return;const s=Math.round(st.t*300);c.innerHTML=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}<small>min, nopeutettu</small>`}
+
+function render(){
+  const E=EXP[st.exp],n=E.steps.length;
+  document.querySelectorAll('[data-exp]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.exp===st.exp));
+  $('picks').innerHTML=st.tubes.map((s,i)=>`<div><label for="sel${i}">Putki ${'ABCDE'[i]}</label><select id="sel${i}" data-i="${i}" ${st.phase>0?'disabled':''}>${Object.keys(SUB).map(k=>`<option value="${k}" ${k===s?'selected':''}>${SUB[k].n}</option>`).join('')}</select></div>`).join('');
+  const done=st.phase>=n&&!st.heating;
+  $('steps').innerHTML=`<h2>Työvaiheet</h2><ol>${E.steps.map((s,k)=>{
+      const c=k<st.phase?'done':k===st.phase?'cur':'';
+      let x=`<li class="${c}">${s.t}`;
+      if(k===st.phase&&!done){x+=s.w?`<span class="warn">${s.w}</span>`:'';
+        x+=st.heating?`<div class="clock" id="clock"></div>`:`<br><button class="btn" id="act" ${st.busy?'disabled':''}>${s.b}</button>`}
+      return x+'</li>'}).join('')}</ol>
+    ${st.phase===0?'<p style="color:var(--muted);font-size:14px;margin-top:12px">Voit vaihtaa putkien aineet ennen kuin aloitat.</p>':''}
+    ${st.phase>0?`<button class="btn o" id="reset">Aloita alusta</button>`:''}`;
+  if(st.heating)updClock();
+  const o=$('obs');o.hidden=!done;if(done)drawObs();
+  kick();
+}
+function drawObs(){
+  const E=EXP[st.exp];
+  let h=`<h2>Havainnot</h2><p class="q">${E.q}</p>`;
+  h+=st.tubes.map((s,i)=>{
+    const sel=st.obs[i],right=E.pos(s)?1:0;
+    let r='';
+    if(st.checked){const ok=sel===right;r=`<p class="res ${ok?'g':'b'}">${ok?'✓ Oikein.':'✗ Tarkista uudelleen.'} <span>${st.exp==='jodi'?(SUB[s].j||`${cap(SUB[s].n)} ei sisällä tärkkelystä, joten jodiliuos jää kellanruskeaksi.`):SUB[s].t}</span></p>`}
+    return `<div class="orow"><div class="who"><span>${'ABCDE'[i]}</span>${SUB[s].n}</div>
+      <div class="choice">${E.obs.map(([t,c],k)=>`<button data-o="${i}" data-v="${k}" aria-pressed="${sel===k}"><i style="background:${c}"></i>${t}</button>`).join('')}</div>${r}</div>`}).join('');
+  const all=st.obs.every(v=>v!==null);
+  h+=`<button class="btn" id="check" ${all?'':'disabled'}>Tarkista havainnot</button>`;
+  if(st.checked){
+    const pos=st.tubes.filter(s=>E.pos(s)).map(s=>SUB[s].n),neg=st.tubes.filter(s=>!E.pos(s)).map(s=>SUB[s].n);
+    h+=`<div class="concl">${st.exp==='trommer'
+      ?`<p><b>Johtopäätös:</b> punaruskea sakka syntyi aineista ${list(pos)}. Ne sisältävät pelkistäviä sokereita.</p><p>Seos pysyi sinisenä aineissa ${list(neg)}. Niissä ei ole pelkistäviä sokereita.</p>`
+      :`<p><b>Johtopäätös:</b> sinimusta väri syntyi aineissa ${list(pos)}. Ne sisältävät tärkkelystä.</p><p>Aineissa ${list(neg)} ei ole tärkkelystä.</p>`}</div>`;
+  }
+  $('obs').innerHTML=h;
+}
+const cap=t=>t[0].toUpperCase()+t.slice(1);
+const list=a=>a.length?a.map(x=>`<b>${x}</b>`).join(', ').replace(/, ([^,]*)$/,' ja $1'):'(ei yhtään)';
+
+function act(){
+  const s=EXP[st.exp].steps[st.phase];
+  if(s.heat){st.heating=true;st.t=0;render();return}
+  if(s.drop){
+    st.busy=true;render();
+    for(let i=0;i<5;i++){const g=$('d'+i),d=cur[i].lvl-20;
+      g.innerHTML=`<circle class="drop" cx="${X(i)}" cy="20" r="6" fill="${s.drop}" stroke="var(--glass)" stroke-width="1" style="--d:${d}px;animation-delay:${i*.18}s;opacity:0"/>`}
+    setTimeout(()=>{for(let i=0;i<5;i++)$('d'+i).innerHTML='';st.busy=false;st.phase++;render()},reduce?50:1500);
+    return;
+  }
+  st.phase++;render();
+}
+function setExp(e){st.exp=e;st.tubes=EXP[e].tubes.slice();reset(true)}
+function reset(rebuild){st.phase=0;st.t=0;st.heating=false;st.busy=false;st.obs=st.tubes.map(()=>null);st.checked=false;if(rebuild)build();render()}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.exp){if(b.dataset.exp!==st.exp)setExp(b.dataset.exp)}
+  else if(b.id==='act'&&!st.busy)act();
+  else if(b.id==='reset')reset(false);
+  else if(b.dataset.o!==undefined){st.obs[+b.dataset.o]=+b.dataset.v;st.checked=false;drawObs()}
+  else if(b.id==='check'){st.checked=true;drawObs()}
+});
+document.addEventListener('change',e=>{if(e.target.matches('select[data-i]')){st.tubes[+e.target.dataset.i]=e.target.value;st.obs=st.tubes.map(()=>null);for(let i=0;i<5;i++)cur[i]=target(i);apply()}});
+setExp('trommer');
+}
+</script>
+</body>
+</html>
