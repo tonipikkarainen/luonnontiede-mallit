@@ -60,6 +60,19 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-o
 .res.g{color:var(--ok)}.res.b{color:var(--bad)}.res span{color:var(--ink)}
 .concl{background:var(--panel);border-radius:14px;padding:16px 20px;margin-top:18px}
 .concl p{margin:0 0 6px}
+.fixed{font:500 14px Lexend,sans-serif;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center;overflow-wrap:anywhere}
+.infer .head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;color:var(--muted);font-size:15px;margin-bottom:6px}
+.infer .meter{height:6px;background:var(--line);border-radius:3px;margin-bottom:18px;overflow:hidden}.infer .meter i{display:block;height:100%;background:var(--ink)}
+.ibox{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(16px,3vw,32px);align-items:start}
+.tubes2{background:var(--panel);border-radius:18px;padding:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:center}
+.tubes2 svg{width:100%;max-width:120px;height:auto;display:block;margin:0 auto}
+.tubes2 b{display:block;font-size:15px;margin-top:6px}.tubes2 span{font-size:14px;color:var(--muted)}
+.iq{margin:0 0 6px;font-size:18px;font-weight:500}
+.iq+.choice{margin-bottom:18px}
+.ifb{border-radius:14px;padding:14px 18px;background:var(--panel);margin-top:4px}
+.ifb p{margin:0 0 6px}
+.g{color:var(--ok)}.b{color:var(--bad)}
+@media(max-width:700px){.ibox{grid-template-columns:minmax(0,1fr)}}
 details{margin-top:24px;border-top:1px solid var(--line);padding-top:12px}
 summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 details p{max-width:70ch}
@@ -76,14 +89,15 @@ details p{max-width:70ch}
 <main class="band">
   <a class="back" href="../index.html">← Kaikki mallit</a>
   <h1>Hiilihydraattien tunnistaminen</h1>
-  <p class="lead">Tee työ vaihe vaiheelta kuten työohjeessa ja seuraa, miten koeputkien värit muuttuvat. Kirjaa lopuksi havaintosi ja tarkista ne.</p>
+  <p class="lead">Tee työ vaihe vaiheelta kuten työohjeessa ja seuraa, miten koeputkien värit muuttuvat. Kirjaa lopuksi havaintosi ja tarkista ne. Päättele tuloksista -tilassa harjoitellaan tunnistamaan tuntemattomia näytteitä.</p>
 
   <div class="seg" role="group" aria-label="Työ">
     <button data-exp="trommer" aria-pressed="true">Yksinkertaisen sokerin osoittaminen</button>
     <button data-exp="jodi" aria-pressed="false">Tärkkelyksen osoittaminen jodiliuoksella</button>
+    <button data-exp="paattele" aria-pressed="false">Päättele tuloksista</button>
   </div>
 
-  <div class="lab">
+  <div class="lab" id="lab">
     <div class="stage">
       <svg id="svg" viewBox="0 0 600 360" role="img" aria-label="Koeputkiteline, jossa viisi koeputkea A–E"></svg>
       <div class="picks" id="picks"></div>
@@ -92,12 +106,13 @@ details p{max-width:70ch}
   </div>
 
   <section class="obs" id="obs" hidden></section>
+  <section class="infer" id="infer" hidden></section>
 
   <details>
     <summary>Mitä koeputkissa tapahtuu?</summary>
-    <p><b>Kuparisulfaattikoe (Trommerin koe).</b> Natriumhydroksidi ja kuparisulfaatti muodostavat sinistä kupari(II)hydroksidia. Pelkistävä sokeri, kuten glukoosi tai fruktoosi, pelkistää kuumennettaessa sinisen Cu²⁺-ionin kupari(I)oksidiksi Cu₂O, joka näkyy punaruskeana sakkana. Väri muuttuu usein vihreän ja keltaisen kautta. Sakkaroosi ja tärkkelys eivät ole pelkistäviä, joten niissä seos pysyy sinisenä.</p>
-    <p><b>Jodikoe.</b> Tärkkelyksen amyloosi on kierteinen ketju, jonka sisään jodi asettuu. Syntyy voimakas sinimusta väri. Sokerit eivät muodosta tällaista kierrettä, joten jodiliuos jää kellanruskeaksi.</p>
-    <p><b>Huomio todellisesta työstä.</b> Kun vertailuputken sinistä kupari(II)hydroksidia kuumennetaan, se voi tummua mustaksi kupari(II)oksidiksi CuO. Musta väri ei tarkoita sokeria.</p>
+    <p data-for="trommer" data-also="paattele"><b>Kuparisulfaattikoe (Trommerin koe).</b> Natriumhydroksidi ja kuparisulfaatti muodostavat sinistä kupari(II)hydroksidia. Pelkistävä sokeri, kuten glukoosi tai fruktoosi, pelkistää kuumennettaessa sinisen Cu²⁺-ionin kupari(I)oksidiksi Cu₂O, joka näkyy punaruskeana sakkana. Väri muuttuu usein vihreän ja keltaisen kautta. Sakkaroosi ja tärkkelys eivät ole pelkistäviä, joten niissä seos pysyy sinisenä.</p>
+    <p data-for="jodi" data-also="paattele" hidden><b>Jodikoe.</b> Tärkkelyksen amyloosi on kierteinen ketju, jonka sisään jodi asettuu. Syntyy voimakas sinimusta väri. Sokerit eivät muodosta tällaista kierrettä, joten jodiliuos jää kellanruskeaksi.</p>
+    <p data-for="trommer"><b>Huomio todellisesta työstä.</b> Kun vertailuputken sinistä kupari(II)hydroksidia kuumennetaan, se voi tummua mustaksi kupari(II)oksidiksi CuO. Musta väri ei tarkoita sokeria.</p>
   </details>
 </main>
 
@@ -201,9 +216,12 @@ function kick(){if(!running){running=true;last=0;requestAnimationFrame(loop)}}
 function updClock(){const c=$('clock');if(!c)return;const s=Math.round(st.t*300);c.innerHTML=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}<small>min, nopeutettu</small>`}
 
 function render(){
-  const E=EXP[st.exp],n=E.steps.length;
+  const E=EXP[st.exp]||EXP.trommer,n=E.steps.length;
   document.querySelectorAll('[data-exp]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.exp===st.exp));
-  $('picks').innerHTML=st.tubes.map((s,i)=>`<div><label for="sel${i}">Putki ${'ABCDE'[i]}</label><select id="sel${i}" data-i="${i}" ${st.phase>0?'disabled':''}>${Object.keys(SUB).map(k=>`<option value="${k}" ${k===s?'selected':''}>${SUB[k].n}</option>`).join('')}</select></div>`).join('');
+  document.querySelectorAll('[data-for]').forEach(p=>p.hidden=p.dataset.for!==st.exp&&p.dataset.also!==st.exp);
+  const inf=st.exp==='paattele';$('lab').hidden=inf;$('infer').hidden=!inf;
+  if(inf){$('obs').hidden=true;drawInfer();return}
+  $('picks').innerHTML=st.exp==='trommer'?st.tubes.map((s,i)=>`<div class="fixed">${SUB[s].n}</div>`).join(''):st.tubes.map((s,i)=>`<div><label for="sel${i}">Putki ${'ABCDE'[i]}</label><select id="sel${i}" data-i="${i}" ${st.phase>0?'disabled':''}>${Object.keys(SUB).map(k=>`<option value="${k}" ${k===s?'selected':''}>${SUB[k].n}</option>`).join('')}</select></div>`).join('');
   const done=st.phase>=n&&!st.heating;
   $('steps').innerHTML=`<h2>Työvaiheet</h2><ol>${E.steps.map((s,k)=>{
       const c=k<st.phase?'done':k===st.phase?'cur':'';
@@ -211,7 +229,7 @@ function render(){
       if(k===st.phase&&!done){x+=s.w?`<span class="warn">${s.w}</span>`:'';
         x+=st.heating?`<div class="clock" id="clock"></div>`:`<br><button class="btn" id="act" ${st.busy?'disabled':''}>${s.b}</button>`}
       return x+'</li>'}).join('')}</ol>
-    ${st.phase===0?'<p style="color:var(--muted);font-size:14px;margin-top:12px">Voit vaihtaa putkien aineet ennen kuin aloitat.</p>':''}
+    ${st.phase===0&&st.exp==='jodi'?'<p style="color:var(--muted);font-size:14px;margin-top:12px">Voit vaihtaa putkien aineet ennen kuin aloitat.</p>':''}
     ${st.phase>0?`<button class="btn o" id="reset">Aloita alusta</button>`:''}`;
   if(st.heating)updClock();
   const o=$('obs');o.hidden=!done;if(done)drawObs();
@@ -251,7 +269,46 @@ function act(){
   }
   st.phase++;render();
 }
-function setExp(e){st.exp=e;st.tubes=EXP[e].tubes.slice();reset(true)}
+const SAMP=[
+  {n:'glukoosi',t:1,j:0,x:'Glukoosi on yksinkertainen sokeri. Kuparisulfaattikoe on positiivinen ja jodikoe negatiivinen.'},
+  {n:'fruktoosi',t:1,j:0,x:'Fruktoosi on yksinkertainen sokeri, joten se antaa punaruskean sakan. Tärkkelystä siinä ei ole.'},
+  {n:'taloussokeri (sakkaroosi)',t:0,j:0,sug:1,x:'Sakkaroosi on disakkaridi. Se ei anna punaruskeaa sakkaa eikä reagoi jodin kanssa.'},
+  {n:'perunajauho',t:0,j:1,x:'Perunajauho on tärkkelystä. Jodikoe on sinimusta, mutta yksinkertaista sokeria siinä ei ole.'},
+  {n:'maissitärkkelys',t:0,j:1,x:'Maissitärkkelys on tärkkelystä, joten vain jodikoe on positiivinen.'},
+  {n:'hunaja',t:1,j:0,x:'Hunajassa on glukoosia ja fruktoosia, mutta ei tärkkelystä.'},
+  {n:'vesi',t:0,j:0,x:'Vedessä ei ole sokeria eikä tärkkelystä, joten molemmat kokeet ovat negatiivisia.'},
+  {n:'omenamehu',t:1,j:0,x:'Omenamehussa on glukoosia ja fruktoosia, mutta ei tärkkelystä.'},
+  {n:'kypsymätön omena',t:1,j:1,x:'Kypsymättömässä omenassa on sekä sokereita että tärkkelystä. Kun omena kypsyy, tärkkelys muuttuu sokereiksi.'},
+  {n:'glukoosin ja perunajauhon seos',t:1,j:1,x:'Seoksessa on sekä glukoosia että tärkkelystä, joten molemmat kokeet ovat positiivisia.'}];
+const inf={list:[],i:0,score:0,a:[null,null],done:false};
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function startInfer(){inf.list=shuf(SAMP).slice(0,8);inf.i=0;inf.score=0;inf.a=[null,null];inf.done=false}
+function mini(col,op,sed,sedCol){return `<svg viewBox="0 0 120 250" aria-hidden="true"><defs><clipPath id="m${col.slice(1)}${sed}"><path d="M36 20 V196 a24 24 0 0 0 48 0 V20"/></clipPath></defs>
+  <g clip-path="url(#m${col.slice(1)}${sed})"><rect x="30" y="120" width="60" height="110" fill="${col}" fill-opacity="${op}"/>${sed?`<rect x="30" y="${222-sed}" width="60" height="${sed+8}" fill="${sedCol}"/>`:''}</g>
+  <path d="M36 20 V196 a24 24 0 0 0 48 0 V20" fill="none" stroke="var(--glass)" stroke-width="3"/><path d="M46 34 V190" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/></svg>`}
+function drawInfer(){
+  const el=$('infer');
+  if(inf.i>=inf.list.length){
+    el.innerHTML=`<div style="text-align:center;padding:10px 0"><div style="font-size:clamp(48px,8vw,72px);font-weight:700;line-height:1">${inf.score} / ${inf.list.length}</div>
+      <p class="iq" style="margin-top:10px">${inf.score===inf.list.length?'Kaikki päätelmät oikein!':'Näytettä pidetään oikein, kun molemmat vastaukset ovat oikein.'}</p><button class="btn" id="iAgain">Uusi kierros</button></div>`;return}
+  const s=inf.list[inf.i],tc=s.t?['#a6391b',.94,24,'punaruskea sakka']:[(s.sug?'#2752c9':'#79aee8'),.86,0,'sininen'];
+  const jc=s.j?['#191a36',.96,'sinimusta']:['#e0b056',.6,'kellanruskea'];
+  const Q=[['Sisältääkö näyte yksinkertaista sokeria?','t'],['Sisältääkö näyte tärkkelystä?','j']];
+  let h=`<div class="head"><span>Näyte ${inf.i+1} / ${inf.list.length}</span><span>Oikein ${inf.score}</span></div><div class="meter"><i style="width:${inf.i/inf.list.length*100}%"></i></div>
+    <div class="ibox"><div class="tubes2">
+      <div>${mini(tc[0],tc[1],tc[2],'#8f2f15')}<b>Kuparisulfaattikoe</b><span>lämmitetty 5 min: ${tc[3]}</span></div>
+      <div>${mini(jc[0],jc[1],0,'')}<b>Jodikoe</b><span>${jc[2]}</span></div></div>
+    <div><h2 style="font-size:22px;margin:0 0 6px">${inf.done?cap(s.n):'Tuntematon näyte'}</h2><p style="color:var(--muted);margin:0 0 16px">Tutki molempien kokeiden tuloksia ja päättele, mitä näyte sisältää.</p>`;
+  Q.forEach(([q,k],qi)=>{h+=`<p class="iq">${q}</p><div class="choice">${['Kyllä','Ei'].map((t,v)=>`<button data-ia="${qi}" data-v="${v}" aria-pressed="${inf.a[qi]===v}" ${inf.done?'disabled':''}>${t}</button>`).join('')}</div>`});
+  if(!inf.done)h+=`<button class="btn" id="iCheck" ${inf.a.includes(null)?'disabled':''}>Tarkista</button>`;
+  else{const ok=[s.t?0:1,s.j?0:1].map((v,k)=>v===inf.a[k]);
+    h+=`<div class="ifb"><p class="${ok[0]&&ok[1]?'g':'b'}"><b>${ok[0]&&ok[1]?'Oikein!':ok[0]||ok[1]?'Puoliksi oikein.':'Ei aivan.'}</b> Näyte oli <b>${s.n}</b>.</p><p>${s.x}</p></div>
+      <button class="btn" id="iNext">${inf.i+1<inf.list.length?'Seuraava näyte':'Tulokset'} →</button>`}
+  el.innerHTML=h+'</div></div>';
+}
+function setExp(e){
+  if(e==='paattele'){st.exp=e;st.heating=false;startInfer();render();return}
+  st.exp=e;st.tubes=EXP[e].tubes.slice();reset(true)}
 function reset(rebuild){st.phase=0;st.t=0;st.heating=false;st.busy=false;st.obs=st.tubes.map(()=>null);st.checked=false;if(rebuild)build();render()}
 
 document.addEventListener('click',e=>{
@@ -261,6 +318,10 @@ document.addEventListener('click',e=>{
   else if(b.id==='reset')reset(false);
   else if(b.dataset.o!==undefined){st.obs[+b.dataset.o]=+b.dataset.v;st.checked=false;drawObs()}
   else if(b.id==='check'){st.checked=true;drawObs()}
+  else if(b.dataset.ia!==undefined){inf.a[+b.dataset.ia]=+b.dataset.v;drawInfer()}
+  else if(b.id==='iCheck'){inf.done=true;const s=inf.list[inf.i];if((s.t?0:1)===inf.a[0]&&(s.j?0:1)===inf.a[1])inf.score++;drawInfer()}
+  else if(b.id==='iNext'){inf.i++;inf.a=[null,null];inf.done=false;drawInfer()}
+  else if(b.id==='iAgain'){startInfer();drawInfer()}
 });
 document.addEventListener('change',e=>{if(e.target.matches('select[data-i]')){st.tubes[+e.target.dataset.i]=e.target.value;st.obs=st.tubes.map(()=>null);for(let i=0;i<5;i++)cur[i]=target(i);apply()}});
 setExp('trommer');
